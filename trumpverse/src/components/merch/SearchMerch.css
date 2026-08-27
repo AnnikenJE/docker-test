@@ -1,0 +1,9 @@
+.search-page__txt {
+  font-family: var(--main-font);
+}
+
+.merch__section {
+  background-color: var(--hidden-background);
+  padding-top: 8px;
+  padding-bottom: 8px;
+}

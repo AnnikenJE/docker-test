@@ -1,0 +1,19 @@
+.merch-name {
+  color: var(--american-flag-blue);
+  font-family: var(--main-font);
+}
+
+.merch__article {
+  background-color: var(--american-flag-white);
+  transition: 0.1s ease-out;
+}
+
+.merch__article:hover {
+  box-shadow: inset 10px -67px 75px -79px rgba(0, 0, 0, 1);
+  transform: translateY(-8px);
+  transition: 0.5s ease-out;
+}
+
+.merch-image__wrapper {
+  display: contents;
+}

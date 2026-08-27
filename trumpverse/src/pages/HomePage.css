@@ -1,0 +1,10 @@
+.home-page__txt {
+  font-family: var(--main-font);
+}
+
+.donald-trump__image {
+  display: block;
+  width: 30%;
+  margin-left: auto;
+  margin-right: auto;
+}

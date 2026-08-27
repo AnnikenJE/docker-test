@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Fugaz+One&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" src="scripts/script.js"></script>
+    <title>TrumpVerse API</title>
+  </head>
+
+  <body>
+    <header class="header">
+      <div class="header-image__wrapper">
+        <img
+          src="assets/trump-header-image.png"
+          alt="Donald Trump 2024 logo."
+          class="header-image"
+        />
+      </div>
+      <h1 class="header-title">TrumpVerse API</h1>
+    </header>
+
+    <main>
+      <section class="introduction__section">
+        <article class="introduction__article">
+          <h2 class="info-title">Documentation</h2>
+
+          <p>Swagger:</p>
+
+          <a href="http://localhost:5290/swagger/index.html">
+            <span class="url__txt">
+              http://localhost:5290/swagger/index.html
+            </span>
+          </a>
+
+          <p>
+            Welcome to the TrumpVerse API, the ultimate API platform for
+            managing and accessing everything related to Trump merchandise. This
+            API is designed to provide seamless and efficient access to a
+            variety of resources, empowering you to build the biggest and
+            greatest applications.
+          </p>
+
+          <p>
+            When referring to TrumpMerch objects, please check the TrumpMerch
+            schema at the bottom of the page.
+          </p>
+
+          <p>
+            To use this API you have to use the base URL with the enpoint at the
+            end.
+          </p>
+
+          <p>
+            <span class="highlighted-txt"> Base URL:</span>
+            <span class="url__txt">http://localhost:5290/api</span>
+          </p>
+        </article>
+      </section>
+
+      <section class="info__section" id="showTrumpMerchInfo">
+        <h3 class="info-title">TrumpMerch</h3>
+      </section>
+
+      <section class="info__section" id="showUploadImageInfo">
+        <h3 class="info-title">UploadImage</h3>
+      </section>
+
+      <section class="schema__section">
+        <h3 class="info-title">TrumpMerch Schema</h3>
+        <article class="info__article">
+          <ul class="schema-list" id="showSchemaInfo"></ul>
+        </article>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>2024 - The greatest API of them all.</p>
+      <p>
+        Example use of the API:
+        <a class="url__txt" href="http://localhost:5173/">Donald Trump Merch</a>
+      </p>
+    </footer>
+  </body>
+</html>

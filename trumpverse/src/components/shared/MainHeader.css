@@ -1,0 +1,7 @@
+.heading__txt {
+  font-family: var(--main-font);
+  color: var(--american-flag-blue);
+}
+.sub-heading__txt {
+  font-family: var(--main-font);
+}

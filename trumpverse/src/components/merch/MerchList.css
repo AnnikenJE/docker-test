@@ -1,0 +1,11 @@
+.merch-list-item__wrapper {
+  .card {
+    height: 100%;
+  }
+}
+
+.merch__section {
+  background-color: var(--hidden-background);
+  padding-top: 8px;
+  padding-bottom: 8px;
+}

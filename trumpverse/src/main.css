@@ -1,0 +1,15 @@
+:root {
+  --main-font: "Merriweather", serif;
+
+  --american-flag-blue: rgb(10, 49, 97);
+  --american-flag-red: rgb(179, 25, 66);
+  --american-flag-white: rgb(255, 255, 255);
+
+  --hidden-background: rgb(219, 219, 219);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--hidden-background);
+}
