@@ -5,6 +5,8 @@
 # SDK-imaget inneholder hele .NET-kompilatoren, ca. 800 MB.
 FROM mcr.microsoft.com/dotnet/sdk:8.0
 
-# TODO(human): skriv resten av Dockerfilen her.
-# Du trenger fire instruksjoner: WORKDIR, COPY, RUN og ENTRYPOINT.
-# (EXPOSE er valgfri dokumentasjon - ta den med hvis du vil.)
+
+WORKDIR /app
+COPY . .
+RUN dotnet publish -c Release -o out
+ENTRYPOINT [ "dotnet", "out/TrumpVerseAPI.dll" ]

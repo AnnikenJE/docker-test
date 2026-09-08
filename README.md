@@ -1,6 +1,7 @@
 # docker-test
 
-> **Work in progress.** Nothing here is containerised yet, see the learning path below.
+> **Work in progress.** The API has a Dockerfile, but nothing is built or running in a
+> container yet, see the learning path below.
 
 Learning Docker, step by step. The app is a copy of
 [AnnikenJE/trump-verse](https://github.com/AnnikenJE/trump-verse), a React frontend and a
@@ -18,7 +19,7 @@ Learning Docker, step by step. The app is a copy of
 | 6 | Docker Compose | Two services on one network |
 | 7 | Environment variables | The API URL out of the source code |
 
-Currently on module 1 of 7.
+Module 1 done, the Dockerfile is written but not yet built. Currently on module 2 of 7.
 
 ## Three things that break in a container
 
