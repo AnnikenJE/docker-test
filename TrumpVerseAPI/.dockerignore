@@ -1,0 +1,22 @@
+# .dockerignore for TrumpVerseAPI
+# Alt som matcher her sendes ikke til Docker-daemonen som build context,
+# og kan derfor heller ikke naas av COPY i Dockerfile.
+
+# Byggeartefakter fra Windows-verten. Storste gevinst: bin/ alene er 122 MB.
+bin/
+obj/
+
+# Versjonskontroll og verktoymapper
+.git/
+.gitignore
+.vs/
+.vscode/
+
+# Dockerfila selv trengs ikke inne i imaget
+Dockerfile
+.dockerignore
+
+# Kjøretidsdata kjøres utenfor imaget. Bryter API-et med vilje
+# Frem til modul 4 monterer volumer på disse stiene
+Database/
+wwwroot/images/
