@@ -20,7 +20,7 @@ Learning Docker, step by step. The app is a copy of
 | 6 | Docker Compose | Two services on one network |
 | 7 | Environment variables | The API URL out of the source code |
 
-Modules 1 and 2 done. Currently on module 3 of 7.
+Modules 1 to 3 done. Currently on module 4 of 7.
 
 ## Three things that break in a container
 
@@ -57,9 +57,48 @@ Inspecting a running container:
 ```bash
 docker ps                            # running containers
 docker logs trumpverse-api           # stdout from the app
-docker exec -it trumpverse-api sh    # a shell inside, look at /app and /app/out
-docker images                        # ~2 GB on disk, the whole SDK ships in the image
+docker exec -it trumpverse-api sh    # a shell inside, look at /app
+docker images                        # 1.96 GB before module 3, 380 MB after
 docker stop trumpverse-api
+```
+
+### Module 3: multi-stage build
+
+The Dockerfile now has two stages. The first one compiles with the SDK image, the second
+one copies only the published output into a runtime image. Nothing else crosses over.
+
+```bash
+cd TrumpVerseAPI
+docker build -t trumpverse-api:multistage .
+docker images trumpverse-api           # 1.96 GB single-stage, 380 MB multi-stage
+docker run --rm --name trumpverse-api -p 8080:8080 trumpverse-api:multistage
+```
+
+Proof the SDK stayed behind, from another terminal:
+
+```bash
+docker exec trumpverse-api dotnet --list-sdks       # empty
+docker exec trumpverse-api dotnet --list-runtimes   # Microsoft.AspNetCore.App 8.0.31
+docker exec trumpverse-api sh -c 'ls /app'          # 36 files, no source, no obj/
+```
+
+`aspnet:8.0` is the right runtime image, not `runtime:8.0` — the latter has no ASP.NET
+Core libraries and the API fails on startup.
+
+Layer caching is the second half of the module. `TrumpVerseAPI.csproj` is copied on its
+own before the rest of the source, so `dotnet restore` only reruns when the project file
+changes:
+
+```bash
+# change any .cs file, then
+docker build -t trumpverse-api:multistage .   # RUN dotnet restore -> CACHED
+```
+
+Debugging a multi-stage build, stopping at a named stage:
+
+```bash
+docker build --target build -t api-build .
+docker run --rm api-build ls /app/out
 ```
 
 Without Docker, with the .NET 8 SDK and Node.js 18+:
