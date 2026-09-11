@@ -31,9 +31,118 @@ Kept on purpose, each fixed in the module that explains it.
 - `serverURL = "http://localhost:5290"`: baked in at build time, and `localhost` means
   something else inside a container
 
+## Command reference
+
+The modules below are a log of how this was learned, in order. This section is the
+manual: enough to get from a clean machine to a running container without rereading them.
+
+### The shape of a docker command
+
+```
+docker run  [flags]  IMAGE  [command]
+```
+
+The image name is always the last argument before an optional command. Everything before
+it is flags; anything after it replaces the image's `ENTRYPOINT`. A flag that goes missing
+turns its value into the image name, which is what `invalid reference format` means.
+
+### Flags used in this repo
+
+| Flag | Long form | What it does |
+|---|---|---|
+| `-t` | `--tag` | Names the image being built: `-t name:tag`. Without a tag, `:latest` is implied |
+| `-p` | `--publish` | Maps `<host port>:<container port>`. Without it the container's ports are unreachable from the host |
+| `-v` | `--volume` | Mounts `<host path>:<container path>[:ro]`. One flag per mount |
+| `-d` | `--detach` | Runs in the background instead of holding the terminal. Without it, `Ctrl+C` stops the container |
+| `-e` | `--env` | Sets an environment variable inside the container: `-e ASPNETCORE_ENVIRONMENT=Development` |
+| `-it` | `--interactive --tty` | Keeps a terminal attached. Needed for `docker exec -it ... sh`, pointless otherwise |
+| | `--rm` | Deletes the container when it stops. Without it, stopped containers pile up in `docker ps -a` |
+| | `--name` | Gives the container a fixed name, so later commands can say `trumpverse-api` instead of a hash |
+| | `--target` | Stops a multi-stage build at a named stage: `--target build` |
+| | `--entrypoint` | Replaces the image's `ENTRYPOINT` for one run: `--entrypoint ls` |
+
+### Paths in `-v`
+
+Three rules, and every mount mistake in this repo broke one of them:
+
+1. **The host side must be absolute.** `./Database` is rejected — the Docker daemon does
+   not know your working directory. `${PWD}` expands to it, and works in both PowerShell
+   and bash.
+2. **The container side is always a Linux path,** whatever the host is. Mixing is normal:
+   `-v D:\dev\...\Database:/app/Database`.
+3. **A bind mount replaces the mount point, it does not merge.** Mounting `/app/wwwroot`
+   hides everything the build put there. Mount the narrowest path that solves the problem.
+
+`${PWD}` is a shell variable, not Docker syntax — the shell substitutes it before Docker
+ever sees the command.
+
+### Shell differences
+
+The blocks below are tagged `bash`, but almost every command is identical in PowerShell.
+Two things are not:
+
+- **Line continuation.** `\` at end of line is bash. PowerShell uses a backtick `` ` ``.
+  Copying a multi-line block into PowerShell fails — join it into one line instead.
+- **`${PWD}`.** Works in both, which is why it is used everywhere below. Plain `$PWD`
+  works too, but the braces keep it from running into the next character.
+
+### Everyday commands
+
+```bash
+docker build -t name:tag .          # build from ./Dockerfile, "." is the build context
+docker run ...                      # create and start a container from an image
+docker ps                           # running containers
+docker ps -a                        # including stopped ones
+docker logs <name>                  # stdout from the app; add -f to follow
+docker exec -it <name> sh           # a shell inside a running container
+docker exec <name> <cmd>            # one command inside, no shell
+docker stop <name>                  # SIGTERM, then SIGKILL after 10s
+docker images                       # local images and their sizes
+docker rm <name>                    # delete a stopped container
+docker rmi <image>                  # delete an image
+docker volume ls                    # named volumes
+docker inspect <name>               # full JSON: mounts, ports, env, entrypoint
+docker system df                    # disk used by images, containers, volumes
+docker system prune                 # delete everything unused. Asks first
+```
+
+### From nothing to running
+
+Docker Desktop must be installed and running — `docker ps` fails with a daemon error if it
+is not.
+
+```bash
+git clone <this repo>
+cd docker-test/TrumpVerseAPI
+docker build -t trumpverse-api:multistage .
+```
+
+Then the run command from module 4 below, which is the current complete one. Check it
+worked:
+
+```bash
+docker ps                                    # STATUS says Up
+curl http://localhost:8080/api/TrumpMerch    # 200 and JSON
+```
+
+### When something is wrong
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `Cannot connect to the Docker daemon` | Docker Desktop is not running. The `docker` command is only a client; the daemon does the work | Start Docker Desktop, wait for the whale icon to stop animating |
+| `docker: invalid reference format` | A flag went missing, so its value ended up where the image name belongs. Docker reads the last non-flag argument as the image | Check that every mount has its own `-v` in front of it, and that the image name is last |
+| `port is already allocated` | An earlier container still holds host port 8080. `--rm` only cleans up on stop, not on a crashed terminal | `docker ps` to find it, `docker stop <name>`, then run again |
+| `docker ps` says Up, but `/api/TrumpMerch` returns 500 | The app started fine; SQLite only opens the file on the first request. No `Database/` mount means no database | Add the `-v` for `Database`, and check `docker logs <name>` for the real exception |
+| Images 404 after mounting | The two sides of `:` point at different directories. A mount never corrects a path, it just overlays one | Both sides must end in `wwwroot/images` |
+| Files in the image disappeared after mounting | A bind mount replaces the mount point rather than merging into it | Mount the narrowest path that solves the problem, not its parent |
+| The terminal hangs after `docker run` | Not an error. Without `-d` the container runs in the foreground and owns the terminal | `Ctrl+C` to stop it, or add `-d` and use `docker logs -f <name>` |
+| A `.cs` change does not show up | The image was not rebuilt. `docker run` always uses the image as it was built | `docker build` again before `docker run` |
+
 ## Running it
 
-Needs Docker Desktop. Commands are added as each module lands.
+Needs Docker Desktop. Each module below adds its commands, in the order they were
+learned — so module 2 still describes the 500 that module 4 fixed. For the current working
+setup, read the command reference above instead.
 
 ### Module 2: build and run the API
 
